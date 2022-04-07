@@ -4,6 +4,9 @@ using namespace std;
 const int STUDENT_MAX_BOOKS = 5;
 const int PROFESSOR_FINE_RATE = 5;
 const int STUDENT_FINE_RATE = 2;
+const string LIBRARIAN_NAME = "Librarian";
+const string LIBRARIAN_ID = "librarian";
+const string LIBRARIAN_PASSWORD = "password";
 
 class Book{
     string title;
@@ -29,10 +32,14 @@ public:
         cout << "Publication: " << publication << endl;
         cout << "Availability: " << (is_available ? "Available" : "Not available") << endl;
     }
+
+    bool check_availability(){
+        return is_available;
+    }
 };
 
 class BookDatabase{
-    vector<Book> books;
+    map<string, Book> books;
 
 public:
     void add(Book book){
@@ -47,20 +54,25 @@ public:
 
     }
 
-    Book search(string isbn){
-
+    bool search(string isbn){
+        return books.find(isbn) != books.end();
     }
 
     void display(){
         cout << "There are " << books.size() << " books in total." << endl;
         cout << "Here is a list of all the books:" << endl;
         int i = 0;
-        for(auto book : books){
+        for(auto book_item : books){
             cout << "Book " << i << ":" << endl;
-            book.display();
+            book_item.second.display();
             cout << endl;
             i++;
         }
+    }
+
+    bool check_availability(string isbn){
+        Book book = books.find(isbn)->second;
+        return book.check_availability();
     }
 };
 
@@ -69,7 +81,6 @@ protected:
     string name;
     string id;
     string password;
-    // string type;
 public:
     void set_creds(string name, string id, string password){
         this->name = name;
@@ -345,7 +356,32 @@ void librarian_flow(){
     }
 }
 
-void professor_flow(){
+void check_book_availability(){
+    int input;
+    while(true){
+        cout << "If you want to check if a book is available for issue, enter 1." << endl;
+        cout << "If you want to go back, enter 2." << endl;
+        cin >> input;
+        if(input == 2){
+            return;
+        }
+        if(input != 1){
+            cout << "Please enter 1 or 2 only." << endl;
+            continue;
+        }
+        string isbn;
+        cout << "Enter the ISBN of the book you want to check the availability of: ";
+        cin >> isbn;
+        if(!books.search(isbn)){
+            cout << "Book not found." << endl;
+            continue;
+        }
+        bool is_available = books.check_availability(isbn);
+        cout << "The book is " << (is_available ? "available." : "not available.") << endl << endl;
+    }
+}
+
+void professor_flow(int user_type, string id){
     cout << "Hello Professor!" << endl;
     int task;
     while(true){
@@ -361,9 +397,11 @@ void professor_flow(){
             break;
         
         case 2:
+            users.display_issued_books(user_type, id);
             break;
         
         case 3:
+            check_book_availability();
             break;
         
         case 4:
@@ -396,6 +434,7 @@ void student_flow(int user_type, string id){
             break;
         
         case 3:
+            check_book_availability();
             break;
         
         case 4:
@@ -423,7 +462,7 @@ int main(){
             break;
         
         case 2:
-            professor_flow();
+            professor_flow(user_type, id);
             break;
         
         case 3:
