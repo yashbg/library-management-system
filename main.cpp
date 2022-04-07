@@ -49,12 +49,13 @@ class BookDatabase{
     map<string, Book> books;
 
 public:
-    void add(string isbn, Book book){
+    void add(string isbn, Book& book){
         books[isbn] = book;
     }
 
-    void update(string isbn, Book& updated_book){
-
+    void update(string isbn, string new_title, string new_author, string new_publication){
+        Book book = books.find(isbn)->second;
+        book.set_details(new_title, new_author, isbn, new_publication);
     }
 
     void remove(string isbn){
@@ -67,8 +68,8 @@ public:
 
     void display(){
         cout << "There are " << books.size() << " books in total." << endl;
-        cout << "Here is a list of all the books:" << endl;
-        int i = 0;
+        cout << "Here is a list of all the books:" << endl << endl;
+        int i = 1;
         for(auto book_item : books){
             cout << "Book " << i << ":" << endl;
             book_item.second.display();
@@ -78,8 +79,7 @@ public:
     }
 
     bool check_availability(string isbn){
-        Book book = books.find(isbn)->second;
-        return book.check_availability();
+        return books.find(isbn)->second.check_availability();
     }
 };
 
@@ -116,7 +116,7 @@ public:
     void display_issued_books(){
         cout << "You have issued " << books_issued.size() << " books." << endl;
         cout << "Here is a list of the books:" << endl;
-        int i = 0;
+        int i = 1;
         for(auto book : books_issued){
             cout << "Book " << i << ":" << endl;
             book.display();
@@ -142,7 +142,7 @@ public:
     void display_issued_books(){
         cout << "You have issued " << books_issued.size() << " books." << endl;
         cout << "Here is a list of the books:" << endl;
-        int i = 0;
+        int i = 1;
         for(auto book : books_issued){
             cout << "Book " << i << ":" << endl;
             book.display();
@@ -299,7 +299,7 @@ void librarian_user_tasks(){
 }
 
 void add_book(){
-    string title, author, isbn, publication;
+    string isbn, title, author, publication;
     int input;
     while(true){
         cout << "If you want to add a new book, enter 1." << endl;
@@ -312,21 +312,52 @@ void add_book(){
             cout << "Please enter 1 or 2 only." << endl;
             continue;
         }
-        cout << "Please enter the title of the book: ";
-        cin >> title;
-        cout << "Please enter the name of the author: ";
-        cin >> author;
         cout << "Please enter the ISBN of the book: ";
         cin >> isbn;
-        cout << "Please enter the publication of the book: ";
-        cin >> publication;
         if(books.search(isbn)){
             cout << "This book already exists." << endl;
             continue;
         }
+        cout << "Please enter the title of the book: ";
+        cin >> title;
+        cout << "Please enter the name of the author: ";
+        cin >> author;
+        cout << "Please enter the publication of the book: ";
+        cin >> publication;
         Book book;
         book.set_details(title, author, isbn, publication);
         books.add(isbn, book);
+        break;
+    }
+}
+
+void update_book(){
+    string isbn, new_title, new_author, new_publication;
+    int input;
+    while(true){
+        cout << "If you want to update a book, enter 1." << endl;
+        cout << "If you want to go back, enter 2." << endl;
+        cin >> input;
+        if(input == 2){
+            return;
+        }
+        if(input != 1){
+            cout << "Please enter 1 or 2 only." << endl;
+            continue;
+        }
+        cout << "Please enter the ISBN of the book: ";
+        cin >> isbn;
+        if(!books.search(isbn)){
+            cout << "Book not found." << endl;
+            continue;
+        }
+        cout << "Please enter the new title of the book: ";
+        cin >> new_title;
+        cout << "Please enter the new name of the author: ";
+        cin >> new_author;
+        cout << "Please enter the new publication of the book: ";
+        cin >> new_publication;
+        books.update(isbn, new_title, new_author, new_publication);
         break;
     }
 }
@@ -352,6 +383,7 @@ void librarian_book_tasks(){
             break;
         
         case 3:
+            update_book();
             break;
         
         case 4:
