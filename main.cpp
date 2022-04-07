@@ -55,47 +55,9 @@ public:
         this->id = id;
         this->password = password;
     }
-};
 
-class UserDatabase{
-    map<string, Professor> professors;
-    map<string, Student> students;
-
-public:
-    void add(string user_type, string name, string id, string password){
-        if(user_type == "professor"){
-            Professor professor;
-            professor.set_creds(name, id, password);
-            professors[id] = professor;
-        }
-        else if(user_type == "student"){
-            Student student;
-            student.set_creds(name, id, password);
-            students[id] = student;
-        }
-    }
-
-    bool exists(string id){
-
-    }
-
-    void update(string id, User& updated_user){
-
-    }
-
-    void remove(string id){
-
-    }
-
-    User search(int user_type, string id){
-        if(user_type == "professor"){
-            return 
-        }
-        else if(user_type == "student"){
-            Student student;
-            student.set_creds(name, id, password);
-            students[id] = student;
-        }
+    bool check_password(string password){
+        return this->password == password;
     }
 };
 
@@ -133,50 +95,59 @@ class Librarian: public User{
 
 };
 
-bool check_id(int user_type, string id, UserDatabase& users){
-    // if(id == "yash"){
-    //     return true;
-    // }
-    // return false;
+class UserDatabase{
+    map<string, Professor> professors;
+    map<string, Student> students;
 
-    switch(user_type){
-    case 1:
-        users.search()
-        break;
-    
-    case 2:
-        login_professor();
-        break;
-    
-    case 3:
-        login_student();
-        break;
-
-    default:
-        continue;
+public:
+    void add(int user_type, string name, string id, string password){
+        if(user_type == 2){
+            Professor professor;
+            professor.set_creds(name, id, password);
+            professors[id] = professor;
+        }
+        else{
+            Student student;
+            student.set_creds(name, id, password);
+            students[id] = student;
+        }
     }
-}
 
-bool check_creds(int user_type, string id, string password, UserDatabase& users){
-    if(id == "yash" && password == "pswd"){
-        return true;
+    void update(string id, User& updated_user){
+
     }
-    return false;
-}
+
+    void remove(string id){
+
+    }
+
+    bool search(int user_type, string id, string password){
+        if(user_type == 2){
+            auto professor_itr = professors.find(id);
+            if(professor_itr == professors.end()){
+                return false;
+            }
+            Professor professor = professor_itr->second;
+            return professor.check_password(password);
+        }
+        auto student_itr = students.find(id);
+        if(student_itr == students.end()){
+            return false;
+        }
+        Student student = student_itr->second;
+        return student.check_password(password);
+    }
+};
 
 bool login(int user_type, UserDatabase& users){
     string id, password;
     while(true){
         cout << "Please enter your ID: ";
         cin >> id;
-        if(!check_id(user_type, id, users)){
-            cout << "Incorrect ID. " << endl;
-            continue;
-        }
         cout << "Please enter your password: ";
         cin >> password;
-        if(!check_creds(user_type, id, password, users)){
-            cout << "Incorrect password. " << endl;
+        if(!users.search(user_type, id, password)){
+            cout << "Incorrect credentials. " << endl;
             continue;
         }
         cout << "Successfully logged in!" << endl;
@@ -204,6 +175,5 @@ int main(){
     Librarian librarian;
     librarian.set_creds("Librarian", "librarian", "password");
     welcome(users);
-    if()
     return 0;
 }
