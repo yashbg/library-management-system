@@ -54,7 +54,9 @@ class BookDatabase{
     map<string, Book> books;
 
 public:
-    void add(string isbn, Book& book){
+    void add(string title, string author, string isbn, string publication){
+        Book book;
+        book.set_details(title, author, isbn, publication);
         books[isbn] = book;
     }
 
@@ -324,17 +326,19 @@ void add_user(){
             continue;
         }
         int user_type = input + 1;
-        cout << "Please enter the ID of the user: ";
+        cout << "Please enter the ID of the " << (user_type == 2 ? "professor" : "student") << ": ";
         cin >> id;
         if(users.search(user_type, id)){
             cout << "A " << (user_type == 2 ? "professor" : "student") << " with this ID already exists." << endl;
             continue;
         }
-        cout << "Please enter the name of the " << (user_type == 2 ? "professor" : "student") << ": ";
+        cout << "Now, please enter the credentials of the " << (user_type == 2 ? "professor." : "student.") << endl;
+        cout << "Name: ";
         cin >> name;
-        cout << "Please enter the password of the " << (user_type == 2 ? "professor" : "student") << ": ";
+        cout << "Password: ";
         cin >> password;
         users.add(user_type, name, id, password);
+        cout << (user_type == 2 ? "Professor" : "Student") << " added!" << endl << endl;
         break;
     }
 }
@@ -398,15 +402,15 @@ void add_book(){
             cout << "This book already exists." << endl;
             continue;
         }
-        cout << "Please enter the title of the book: ";
+        cout << "Now, please enter the details of the book." << endl;
+        cout << "Title: ";
         cin >> title;
-        cout << "Please enter the name of the author: ";
+        cout << "Author: ";
         cin >> author;
-        cout << "Please enter the publication of the book: ";
+        cout << "Publication: ";
         cin >> publication;
-        Book book;
-        book.set_details(title, author, isbn, publication);
-        books.add(isbn, book);
+        books.add(title, author, isbn, publication);
+        cout << "Book added!" << endl << endl;
         break;
     }
 }
