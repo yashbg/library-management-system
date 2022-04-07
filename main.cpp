@@ -104,8 +104,39 @@ class Librarian: private User{
 
 };
 
+bool check_username(string username){
+    if(username == "yash"){
+        return true;
+    }
+    return false;
+}
+
+bool check_creds(string username, string password){
+    if(username == "yash" && password == "pswd"){
+        return true;
+    }
+    return false;
+}
+
 void welcome(){
-    cout << "Welcome to Library Management System!";
+    cout << "Welcome to Library Management System!" << endl;
+    string username, password;
+    while(true){
+        cout << "Please enter your username: ";
+        cin >> username;
+        if(!check_username(username)){
+            cout << "Incorrect username. " << endl;
+            continue;
+        }
+        cout << "Please enter your password: ";
+        cin >> password;
+        if(!check_creds(username, password)){
+            cout << "Incorrect password. " << endl;
+            continue;
+        }
+        cout << "Successfully logged in!" << endl;
+        break;
+    }
 }
 
 int main(){
