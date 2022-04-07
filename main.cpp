@@ -1,6 +1,10 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+const int STUDENT_MAX_BOOKS = 5;
+const int PROFESSOR_FINE_RATE = 5;
+const int STUDENT_FINE_RATE = 2;
+
 class Book{
     string title;
     string author;
@@ -63,7 +67,6 @@ public:
 };
 
 class Professor: public User{
-    const int FINE_RATE = 2;
     int fine_amount;
     vector<Book> books_issued;
 
@@ -78,8 +81,6 @@ public:
 };
 
 class Student: public User{
-    const int MAX_BOOKS = 5;
-    const int FINE_RATE = 2;
     int fine_amount;
     vector<Book> books_issued;
 
