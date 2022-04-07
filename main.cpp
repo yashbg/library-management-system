@@ -226,7 +226,40 @@ void librarian_user_tasks(){
 }
 
 void librarian_book_tasks(){
-
+    int sub_task;
+    while(true){
+        cout << "Please enter:" << endl;
+        cout << "1 to list all books" << endl;
+        cout << "2 to add a new book" << endl;
+        cout << "3 to update a book" << endl;
+        cout << "4 to delete a book" << endl;
+        cout << "5 to check which user a book is issued to" << endl;
+        cout << "6 to go back" << endl;
+        cin >> sub_task;
+        switch(sub_task){
+        case 1:
+            break;
+        
+        case 2:
+            break;
+        
+        case 3:
+            break;
+        
+        case 4:
+            break;
+        
+        case 5:
+            break;
+        
+        case 6:
+            return;
+        
+        default:
+            cout << "Please enter 1, 2, 3, 4, 5 or 6 only." << endl;
+            continue;
+        }
+    }
 }
 
 void librarian_flow(){
