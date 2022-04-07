@@ -94,6 +94,18 @@ public:
     void clear_fine_amount(){
 
     }
+
+    void display_issued_books(){
+        cout << "You have issued " << books_issued.size() << " books." << endl;
+        cout << "Here is a list of the books:" << endl;
+        int i = 0;
+        for(auto book : books_issued){
+            cout << "Book " << i << ":" << endl;
+            book.display();
+            cout << endl;
+            i++;
+        }
+    }
 };
 
 class Student: public User{
@@ -107,6 +119,18 @@ public:
 
     void clear_fine_amount(){
 
+    }
+
+    void display_issued_books(){
+        cout << "You have issued " << books_issued.size() << " books." << endl;
+        cout << "Here is a list of the books:" << endl;
+        int i = 0;
+        for(auto book : books_issued){
+            cout << "Book " << i << ":" << endl;
+            book.display();
+            cout << endl;
+            i++;
+        }
     }
 };
 
@@ -156,13 +180,24 @@ public:
         Student student = student_itr->second;
         return student.check_creds(id, password);
     }
+
+    void display_issued_books(int user_type, string id){
+        if(user_type == 2){
+            Professor professor = professors.find(id)->second;
+            professor.display_issued_books();
+        }
+        else{
+            Student student = students.find(id)->second;
+            student.display_issued_books();
+        }
+    }
 };
 
 UserDatabase users;
 Librarian librarian;
 BookDatabase books;
 
-void login(int user_type){
+string login(int user_type){
     string id, password;
     while(true){
         cout << "Please enter your ID: ";
@@ -174,19 +209,19 @@ void login(int user_type){
                 cout << "Incorrect credentials." << endl;
                 continue;
             }
-            cout << "Successfully logged in!" << endl;
-            break;
+            cout << "Successfully logged in!" << endl << endl;
+            return id;
         }
         if(!users.search(user_type, id, password)){
             cout << "Incorrect credentials." << endl;
             continue;
         }
         cout << "Successfully logged in!" << endl << endl;
-        break;
+        return id;
     }
 }
 
-int welcome(){
+pair<int, string> welcome(){
     cout << "Welcome to Library Management System!" << endl;
     int input;
     while(true){
@@ -196,15 +231,15 @@ int welcome(){
         cout << "If you want to exit, enter 4." << endl;
         cin >> input;
         if(input == 4){
-            return -1;
+            return make_pair(-1, "");
         }
         int user_type = input;
         if(!(user_type == 1 || user_type == 2 || user_type == 3)){
             cout << "Please enter 1, 2 or 3 only." << endl;
             continue;
         }
-        login(user_type);
-        return user_type;
+        string id = login(user_type);
+        return {user_type, id};
     }
 }
 
@@ -341,7 +376,7 @@ void professor_flow(){
     }
 }
 
-void student_flow(){
+void student_flow(int user_type, string id){
     cout << "Hello Student!" << endl;
     int task;
     while(true){
@@ -357,6 +392,7 @@ void student_flow(){
             break;
         
         case 2:
+            users.display_issued_books(user_type, id);
             break;
         
         case 3:
@@ -375,7 +411,8 @@ void student_flow(){
 int main(){
     librarian.set_creds("Librarian", "librarian", "password");
     while(true){
-        int input = welcome();
+        // pair<int, string>
+        auto [input, id] = welcome();
         if(input == -1){
             return 0;
         }
@@ -390,7 +427,7 @@ int main(){
             break;
         
         case 3:
-            student_flow();
+            student_flow(user_type, id);
             break;
         
         default:
