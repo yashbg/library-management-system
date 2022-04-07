@@ -56,8 +56,8 @@ public:
         this->password = password;
     }
 
-    bool check_password(string password){
-        return this->password == password;
+    bool check_creds(string id, string password){
+        return this->id == id && this->password == password;
     }
 };
 
@@ -128,24 +128,32 @@ public:
                 return false;
             }
             Professor professor = professor_itr->second;
-            return professor.check_password(password);
+            return professor.check_creds(id, password);
         }
         auto student_itr = students.find(id);
         if(student_itr == students.end()){
             return false;
         }
         Student student = student_itr->second;
-        return student.check_password(password);
+        return student.check_creds(id, password);
     }
 };
 
-bool login(int user_type, UserDatabase& users){
+void login(int user_type, Librarian& librarian, UserDatabase& users){
     string id, password;
     while(true){
         cout << "Please enter your ID: ";
         cin >> id;
         cout << "Please enter your password: ";
         cin >> password;
+        if(user_type == 1){
+            if(!librarian.check_creds(id, password)){
+                cout << "Incorrect credentials. " << endl;
+                continue;
+            }
+            cout << "Successfully logged in!" << endl;
+            break;
+        }
         if(!users.search(user_type, id, password)){
             cout << "Incorrect credentials. " << endl;
             continue;
@@ -155,7 +163,7 @@ bool login(int user_type, UserDatabase& users){
     }
 }
 
-void welcome(UserDatabase& users){
+void welcome(Librarian& librarian, UserDatabase& users){
     cout << "Welcome to Library Management System!" << endl;
     int user_type;
     while(true){
@@ -164,9 +172,11 @@ void welcome(UserDatabase& users){
         cout << "If you are a student, enter 3. " << endl;
         cin >> user_type;
         if(!(user_type == 1 || user_type == 2 || user_type == 3)){
+            cout << "Please only enter 1, 2 or 3" << endl;
             continue;
         }
-        login(user_type, users);
+        login(user_type, librarian, users);
+        break;
     }
 }
 
@@ -174,6 +184,6 @@ int main(){
     UserDatabase users;
     Librarian librarian;
     librarian.set_creds("Librarian", "librarian", "password");
-    welcome(users);
+    welcome(librarian, users);
     return 0;
 }
