@@ -168,12 +168,17 @@ void login(int user_type, Librarian& librarian, UserDatabase& users){
 
 int welcome(Librarian& librarian, UserDatabase& users){
     cout << "Welcome to Library Management System!" << endl;
-    int user_type;
+    int input;
     while(true){
         cout << "If you are the librarian, enter 1." << endl;
         cout << "If you are a professor, enter 2." << endl;
         cout << "If you are a student, enter 3." << endl;
-        cin >> user_type;
+        cout << "If you want to exit, enter 4." << endl;
+        cin >> input;
+        if(input == 4){
+            return -1;
+        }
+        int user_type = input;
         if(!(user_type == 1 || user_type == 2 || user_type == 3)){
             cout << "Please enter 1, 2 or 3 only." << endl;
             continue;
@@ -192,6 +197,7 @@ void librarian_user_tasks(){
         cout << "3 to update a user" << endl;
         cout << "4 to delete a user" << endl;
         cout << "5 to list all books issued to a user" << endl;
+        cout << "6 to go back" << endl;
         cin >> sub_task;
         switch(sub_task){
         case 1:
@@ -209,8 +215,11 @@ void librarian_user_tasks(){
         case 5:
             break;
         
+        case 6:
+            return;
+        
         default:
-            cout << "Please enter 1, 2, 3, 4 or 5 only." << endl;
+            cout << "Please enter 1, 2, 3, 4, 5 or 6 only." << endl;
             continue;
         }
     }
@@ -227,6 +236,7 @@ void librarian_flow(){
         cout << "Please enter:" << endl;
         cout << "1 for users" << endl;
         cout << "2 for books" << endl;
+        cout << "3 to logout" << endl;
         cin >> task;
         switch(task){
         case 1:
@@ -237,8 +247,11 @@ void librarian_flow(){
             librarian_book_tasks();
             break;
         
+        case 3:
+            return;
+        
         default:
-            cout << "Please enter 1 or 2 only." << endl;
+            cout << "Please enter 1, 2 or 3 only." << endl;
             continue;
         }
     }
@@ -252,6 +265,7 @@ void professor_flow(){
         cout << "1 to see all books" << endl;
         cout << "2 to list all books you have" << endl;
         cout << "3 to check if a book is available for issue" << endl;
+        cout << "4 to logout" << endl;
         cin >> task;
         switch(task){
         case 1:
@@ -263,8 +277,11 @@ void professor_flow(){
         case 3:
             break;
         
+        case 4:
+            return;
+        
         default:
-            cout << "Please enter 1, 2 or 3 only." << endl;
+            cout << "Please enter 1, 2, 3 or 4 only." << endl;
             continue;
         }
     }
@@ -278,6 +295,7 @@ void student_flow(){
         cout << "1 to see all books" << endl;
         cout << "2 to list all books you have" << endl;
         cout << "3 to check if a book is available for issue" << endl;
+        cout << "4 to logout" << endl;
         cin >> task;
         switch(task){
         case 1:
@@ -289,8 +307,11 @@ void student_flow(){
         case 3:
             break;
         
+        case 4:
+            return;
+        
         default:
-            cout << "Please enter 1, 2, 3, 4 or 5 only." << endl;
+            cout << "Please enter 1, 2, 3 or 4 only." << endl;
             continue;
         }
     }
@@ -300,22 +321,28 @@ int main(){
     UserDatabase users;
     Librarian librarian;
     librarian.set_creds("Librarian", "librarian", "password");
-    int user_type = welcome(librarian, users);
-    switch(user_type){
-    case 1:
-        librarian_flow();
-        break;
-    
-    case 2:
-        professor_flow();
-        break;
-    
-    case 3:
-        student_flow();
-        break;
-    
-    default:
-        break;
+    while(true){
+        int input = welcome(librarian, users);
+        if(input == -1){
+            return 0;
+        }
+        int user_type = input;
+        switch(user_type){
+        case 1:
+            librarian_flow();
+            break;
+        
+        case 2:
+            professor_flow();
+            break;
+        
+        case 3:
+            student_flow();
+            break;
+        
+        default:
+            break;
+        }
     }
     return 0;
 }
