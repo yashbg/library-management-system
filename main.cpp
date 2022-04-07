@@ -13,10 +13,17 @@ class Book{
     string author;
     string isbn;
     string publication;
-    bool is_available;
+    bool is_available = true;
     string issued_to_id;
 
 public:
+    void set_details(string title, string author, string isbn, string publication){
+        this->title = title;
+        this->author = author;
+        this->isbn = isbn;
+        this->publication = publication;
+    }
+
     void book_request(string isbn){
         
     }
@@ -42,8 +49,8 @@ class BookDatabase{
     map<string, Book> books;
 
 public:
-    void add(Book book){
-
+    void add(string isbn, Book book){
+        books[isbn] = book;
     }
 
     void update(string isbn, Book& updated_book){
@@ -291,6 +298,39 @@ void librarian_user_tasks(){
     }
 }
 
+void add_book(){
+    string title, author, isbn, publication;
+    int input;
+    while(true){
+        cout << "If you want to add a new book, enter 1." << endl;
+        cout << "If you want to go back, enter 2." << endl;
+        cin >> input;
+        if(input == 2){
+            return;
+        }
+        if(input != 1){
+            cout << "Please enter 1 or 2 only." << endl;
+            continue;
+        }
+        cout << "Please enter the title of the book: ";
+        cin >> title;
+        cout << "Please enter the name of the author: ";
+        cin >> author;
+        cout << "Please enter the ISBN of the book: ";
+        cin >> isbn;
+        cout << "Please enter the publication of the book: ";
+        cin >> publication;
+        if(books.search(isbn)){
+            cout << "This book already exists." << endl;
+            continue;
+        }
+        Book book;
+        book.set_details(title, author, isbn, publication);
+        books.add(isbn, book);
+        break;
+    }
+}
+
 void librarian_book_tasks(){
     int sub_task;
     while(true){
@@ -304,9 +344,11 @@ void librarian_book_tasks(){
         cin >> sub_task;
         switch(sub_task){
         case 1:
+            books.display();
             break;
         
         case 2:
+            add_book();
             break;
         
         case 3:
@@ -378,6 +420,7 @@ void check_book_availability(){
         }
         bool is_available = books.check_availability(isbn);
         cout << "The book is " << (is_available ? "available." : "not available.") << endl << endl;
+        break;
     }
 }
 
@@ -450,7 +493,6 @@ void student_flow(int user_type, string id){
 int main(){
     librarian.set_creds("Librarian", "librarian", "password");
     while(true){
-        // pair<int, string>
         auto [input, id] = welcome();
         if(input == -1){
             return 0;
