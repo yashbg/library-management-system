@@ -14,6 +14,7 @@ class Book{
     string isbn;
     string publication;
     bool is_available = true;
+    int issued_to_type;
     string issued_to_id;
 
 public:
@@ -42,6 +43,10 @@ public:
 
     bool check_availability(){
         return is_available;
+    }
+
+    pair<int, string> check_book_issued_to(){
+        return {issued_to_type, issued_to_id};
     }
 };
 
@@ -81,6 +86,10 @@ public:
     bool check_availability(string isbn){
         return books.find(isbn)->second.check_availability();
     }
+
+    pair<int, string> check_book_issued_to(string isbn){
+        return books.find(isbn)->second.check_book_issued_to();
+    }
 };
 
 class User{
@@ -97,6 +106,11 @@ public:
 
     bool check_creds(string id, string password){
         return this->id == id && this->password == password;
+    }
+
+    void display(){
+        cout << "Name: " << name << endl;
+        cout << "ID: " << id << endl;
     }
 };
 
@@ -208,6 +222,16 @@ public:
             Student student = students.find(id)->second;
             student.display_issued_books();
         }
+    }
+
+    void display_by_id(int user_type, string id){
+        if(user_type == 2){
+            professors.find(id)->second.display();
+        }
+        else{
+            students.find(id)->second.display();
+        }
+        cout << endl;
     }
 };
 
@@ -387,6 +411,36 @@ void delete_book(){
     }
 }
 
+void check_book_issued_to(){
+    string isbn;
+    int input;
+    while(true){
+        cout << "If you want to check which user a book is issued to, enter 1." << endl;
+        cout << "If you want to go back, enter 2." << endl;
+        cin >> input;
+        if(input == 2){
+            return;
+        }
+        if(input != 1){
+            cout << "Please enter 1 or 2 only." << endl;
+            continue;
+        }
+        cout << "Please enter the ISBN of the book: ";
+        cin >> isbn;
+        if(!books.search(isbn)){
+            cout << "Book not found." << endl;
+            continue;
+        }
+        if(books.check_availability(isbn)){
+            cout << "The book is not issued to anyone." << endl << endl;
+            break;
+        }
+        auto [user_type, id] = books.check_book_issued_to(isbn);
+        users.display_by_id(user_type, id);
+        break;
+    }
+}
+
 void librarian_book_tasks(){
     int sub_task;
     while(true){
@@ -416,6 +470,7 @@ void librarian_book_tasks(){
             break;
         
         case 5:
+            check_book_issued_to();
             break;
         
         case 6:
