@@ -26,7 +26,7 @@ public:
 
     }
 
-    void update(string isbn, Book updated_book){
+    void update(string isbn, Book& updated_book){
 
     }
 
@@ -48,16 +48,38 @@ protected:
     string name;
     string id;
     string password;
+    // string type;
+public:
+    void set_creds(string name, string id, string password){
+        this->name = name;
+        this->id = id;
+        this->password = password;
+    }
 };
 
 class UserDatabase{
-    vector<User> users;
+    map<string, Professor> professors;
+    map<string, Student> students;
 
-    void add(User user){
+public:
+    void add(string user_type, string name, string id, string password){
+        if(user_type == "professor"){
+            Professor professor;
+            professor.set_creds(name, id, password);
+            professors[id] = professor;
+        }
+        else if(user_type == "student"){
+            Student student;
+            student.set_creds(name, id, password);
+            students[id] = student;
+        }
+    }
+
+    bool exists(string id){
 
     }
 
-    void update(string id, User updated_user){
+    void update(string id, User& updated_user){
 
     }
 
@@ -65,12 +87,19 @@ class UserDatabase{
 
     }
 
-    User search(string id){
-
+    User search(int user_type, string id){
+        if(user_type == "professor"){
+            return 
+        }
+        else if(user_type == "student"){
+            Student student;
+            student.set_creds(name, id, password);
+            students[id] = student;
+        }
     }
 };
 
-class Professor: private User{
+class Professor: public User{
     int fine_amount;
     vector<Book> books_issued;
     int fine_rate = 5;
@@ -85,7 +114,7 @@ public:
     }
 };
 
-class Student: private User{
+class Student: public User{
     int fine_amount;
     vector<Book> books_issued;
     int fine_rate = 2;
@@ -100,37 +129,53 @@ public:
     }
 };
 
-class Librarian: private User{
+class Librarian: public User{
 
 };
 
-bool check_username(string username){
-    if(username == "yash"){
+bool check_id(int user_type, string id, UserDatabase& users){
+    // if(id == "yash"){
+    //     return true;
+    // }
+    // return false;
+
+    switch(user_type){
+    case 1:
+        users.search()
+        break;
+    
+    case 2:
+        login_professor();
+        break;
+    
+    case 3:
+        login_student();
+        break;
+
+    default:
+        continue;
+    }
+}
+
+bool check_creds(int user_type, string id, string password, UserDatabase& users){
+    if(id == "yash" && password == "pswd"){
         return true;
     }
     return false;
 }
 
-bool check_creds(string username, string password){
-    if(username == "yash" && password == "pswd"){
-        return true;
-    }
-    return false;
-}
-
-void welcome(){
-    cout << "Welcome to Library Management System!" << endl;
-    string username, password;
+bool login(int user_type, UserDatabase& users){
+    string id, password;
     while(true){
-        cout << "Please enter your username: ";
-        cin >> username;
-        if(!check_username(username)){
-            cout << "Incorrect username. " << endl;
+        cout << "Please enter your ID: ";
+        cin >> id;
+        if(!check_id(user_type, id, users)){
+            cout << "Incorrect ID. " << endl;
             continue;
         }
         cout << "Please enter your password: ";
         cin >> password;
-        if(!check_creds(username, password)){
+        if(!check_creds(user_type, id, password, users)){
             cout << "Incorrect password. " << endl;
             continue;
         }
@@ -139,7 +184,26 @@ void welcome(){
     }
 }
 
+void welcome(UserDatabase& users){
+    cout << "Welcome to Library Management System!" << endl;
+    int user_type;
+    while(true){
+        cout << "If you are the librarian, enter 1. " << endl;
+        cout << "If you are a professor, enter 2. " << endl;
+        cout << "If you are a student, enter 3. " << endl;
+        cin >> user_type;
+        if(!(user_type == 1 || user_type == 2 || user_type == 3)){
+            continue;
+        }
+        login(user_type, users);
+    }
+}
+
 int main(){
-    welcome();
+    UserDatabase users;
+    Librarian librarian;
+    librarian.set_creds("Librarian", "librarian", "password");
+    welcome(users);
+    if()
     return 0;
 }
