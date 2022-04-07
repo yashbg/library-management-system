@@ -195,7 +195,14 @@ public:
 
     }
 
-    bool search(int user_type, string id, string password){
+    bool search(int user_type, string id){
+        if(user_type == 2){
+            return professors.find(id) != professors.end();
+        }
+        return students.find(id) != students.end();
+    }
+
+    bool check_creds(int user_type, string id, string password){
         if(user_type == 2){
             auto professor_itr = professors.find(id);
             if(professor_itr == professors.end()){
@@ -270,7 +277,7 @@ string login(int user_type){
             cout << "Successfully logged in!" << endl << endl;
             return id;
         }
-        if(!users.search(user_type, id, password)){
+        if(!users.check_creds(user_type, id, password)){
             cout << "Incorrect credentials." << endl;
             continue;
         }
@@ -301,6 +308,37 @@ pair<int, string> welcome(){
     }
 }
 
+void add_user(){
+    string id, name, password;
+    int input;
+    while(true){
+        cout << "If you want to add a new professor, enter 1." << endl;
+        cout << "If you want to add a new student, enter 2." << endl;
+        cout << "If you want to go back, enter 3." << endl;
+        cin >> input;
+        if(input == 3){
+            return;
+        }
+        if(!(input == 1 || input == 2)){
+            cout << "Please enter 1, 2 or 3 only." << endl;
+            continue;
+        }
+        int user_type = input + 1;
+        cout << "Please enter the ID of the user: ";
+        cin >> id;
+        if(users.search(user_type, id)){
+            cout << "A " << (user_type == 2 ? "professor" : "student") << " with this ID already exists." << endl;
+            continue;
+        }
+        cout << "Please enter the name of the " << (user_type == 2 ? "professor" : "student") << ": ";
+        cin >> name;
+        cout << "Please enter the password of the " << (user_type == 2 ? "professor" : "student") << ": ";
+        cin >> password;
+        users.add(user_type, name, id, password);
+        break;
+    }
+}
+
 void librarian_user_tasks(){
     int sub_task;
     while(true){
@@ -318,6 +356,7 @@ void librarian_user_tasks(){
             break;
         
         case 2:
+            add_user();
             break;
         
         case 3:
