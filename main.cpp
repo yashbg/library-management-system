@@ -7,6 +7,7 @@ class Book{
     string isbn;
     string publication;
     bool is_available;
+    string issued_to_id;
 
 public:
     void book_request(string isbn){
@@ -62,9 +63,9 @@ public:
 };
 
 class Professor: public User{
+    const int FINE_RATE = 2;
     int fine_amount;
     vector<Book> books_issued;
-    int fine_rate = 5;
 
 public:
     int calculate_fine(int delay){
@@ -77,9 +78,10 @@ public:
 };
 
 class Student: public User{
+    const int MAX_BOOKS = 5;
+    const int FINE_RATE = 2;
     int fine_amount;
     vector<Book> books_issued;
-    int fine_rate = 2;
 
 public:
     int calculate_fine(int delay){
@@ -242,11 +244,55 @@ void librarian_flow(){
 }
 
 void professor_flow(){
-    
+    cout << "Hello Professor!" << endl;
+    int task;
+    while(true){
+        cout << "Please enter:" << endl;
+        cout << "1 to see all books" << endl;
+        cout << "2 to list all books you have" << endl;
+        cout << "3 to check if a book is available for issue" << endl;
+        cin >> task;
+        switch(task){
+        case 1:
+            break;
+        
+        case 2:
+            break;
+        
+        case 3:
+            break;
+        
+        default:
+            cout << "Please enter 1, 2 or 3 only." << endl;
+            continue;
+        }
+    }
 }
 
 void student_flow(){
-    
+    cout << "Hello Student!" << endl;
+    int task;
+    while(true){
+        cout << "Please enter:" << endl;
+        cout << "1 to see all books" << endl;
+        cout << "2 to list all books you have" << endl;
+        cout << "3 to check if a book is available for issue" << endl;
+        cin >> task;
+        switch(task){
+        case 1:
+            break;
+        
+        case 2:
+            break;
+        
+        case 3:
+            break;
+        
+        default:
+            cout << "Please enter 1, 2, 3, 4 or 5 only." << endl;
+            continue;
+        }
+    }
 }
 
 int main(){
