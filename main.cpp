@@ -59,7 +59,7 @@ public:
     }
 
     void remove(string isbn){
-
+        books.erase(isbn);
     }
 
     bool search(string isbn){
@@ -362,6 +362,31 @@ void update_book(){
     }
 }
 
+void delete_book(){
+    string isbn;
+    int input;
+    while(true){
+        cout << "If you want to delete a book, enter 1." << endl;
+        cout << "If you want to go back, enter 2." << endl;
+        cin >> input;
+        if(input == 2){
+            return;
+        }
+        if(input != 1){
+            cout << "Please enter 1 or 2 only." << endl;
+            continue;
+        }
+        cout << "Please enter the ISBN of the book: ";
+        cin >> isbn;
+        if(!books.search(isbn)){
+            cout << "Book not found." << endl;
+            continue;
+        }
+        books.remove(isbn);
+        break;
+    }
+}
+
 void librarian_book_tasks(){
     int sub_task;
     while(true){
@@ -387,6 +412,7 @@ void librarian_book_tasks(){
             break;
         
         case 4:
+            delete_book();
             break;
         
         case 5:
