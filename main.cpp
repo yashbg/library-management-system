@@ -231,6 +231,24 @@ public:
             students.find(id)->second.display();
         }
     }
+
+    void display(){
+        cout << "There are " << professors.size() << " professors and " << students.size() << " students." << endl;
+        cout << "Here is a list of the professors:" << endl << endl;
+        int i = 1;
+        for(auto professor_item : professors){
+            cout << "Professor " << i << ":" << endl;
+            professor_item.second.display();
+            i++;
+        }
+        cout << "Here is a list of the students:" << endl << endl;
+        i = 1;
+        for(auto student_item : students){
+            cout << "Student " << i << ":" << endl;
+            student_item.second.display();
+            i++;
+        }
+    }
 };
 
 UserDatabase users;
@@ -296,6 +314,7 @@ void librarian_user_tasks(){
         cin >> sub_task;
         switch(sub_task){
         case 1:
+            users.display();
             break;
         
         case 2:
