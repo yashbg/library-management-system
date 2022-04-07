@@ -38,7 +38,7 @@ public:
         cout << "Author: " << author << endl;
         cout << "ISBN: " << isbn << endl;
         cout << "Publication: " << publication << endl;
-        cout << "Availability: " << (is_available ? "Available" : "Not available") << endl;
+        cout << "Availability: " << (is_available ? "Available" : "Not available") << endl << endl;
     }
 
     bool check_availability(){
@@ -78,7 +78,6 @@ public:
         for(auto book_item : books){
             cout << "Book " << i << ":" << endl;
             book_item.second.display();
-            cout << endl;
             i++;
         }
     }
@@ -110,7 +109,7 @@ public:
 
     void display(){
         cout << "Name: " << name << endl;
-        cout << "ID: " << id << endl;
+        cout << "ID: " << id << endl << endl;
     }
 };
 
@@ -231,7 +230,6 @@ public:
         else{
             students.find(id)->second.display();
         }
-        cout << endl;
     }
 };
 
