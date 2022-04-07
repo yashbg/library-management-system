@@ -21,6 +21,14 @@ public:
     string show_duedate(string isbn){
 
     }
+
+    void display(){
+        cout << "Title: " << title << endl;
+        cout << "Author: " << author << endl;
+        cout << "ISBN: " << isbn << endl;
+        cout << "Publication: " << publication << endl;
+        cout << "Availability: " << (is_available ? "Available" : "Not available") << endl;
+    }
 };
 
 class BookDatabase{
@@ -43,8 +51,16 @@ public:
 
     }
 
-    vector<Book> display(){
-
+    void display(){
+        cout << "There are " << books.size() << " books in total." << endl;
+        cout << "Here is a list of all the books:" << endl;
+        int i = 0;
+        for(auto book : books){
+            cout << "Book " << i << ":" << endl;
+            book.display();
+            cout << endl;
+            i++;
+        }
     }
 };
 
@@ -306,6 +322,7 @@ void professor_flow(){
         cin >> task;
         switch(task){
         case 1:
+            books.display();
             break;
         
         case 2:
@@ -336,6 +353,7 @@ void student_flow(){
         cin >> task;
         switch(task){
         case 1:
+            books.display();
             break;
         
         case 2:
