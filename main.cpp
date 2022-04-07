@@ -142,7 +142,11 @@ public:
     }
 };
 
-void login(int user_type, Librarian& librarian, UserDatabase& users){
+UserDatabase users;
+Librarian librarian;
+BookDatabase books;
+
+void login(int user_type){
     string id, password;
     while(true){
         cout << "Please enter your ID: ";
@@ -166,7 +170,7 @@ void login(int user_type, Librarian& librarian, UserDatabase& users){
     }
 }
 
-int welcome(Librarian& librarian, UserDatabase& users){
+int welcome(){
     cout << "Welcome to Library Management System!" << endl;
     int input;
     while(true){
@@ -183,7 +187,7 @@ int welcome(Librarian& librarian, UserDatabase& users){
             cout << "Please enter 1, 2 or 3 only." << endl;
             continue;
         }
-        login(user_type, librarian, users);
+        login(user_type);
         return user_type;
     }
 }
@@ -351,11 +355,9 @@ void student_flow(){
 }
 
 int main(){
-    UserDatabase users;
-    Librarian librarian;
     librarian.set_creds("Librarian", "librarian", "password");
     while(true){
-        int input = welcome(librarian, users);
+        int input = welcome();
         if(input == -1){
             return 0;
         }
