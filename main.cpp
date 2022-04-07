@@ -148,42 +148,127 @@ void login(int user_type, Librarian& librarian, UserDatabase& users){
         cin >> password;
         if(user_type == 1){
             if(!librarian.check_creds(id, password)){
-                cout << "Incorrect credentials. " << endl;
+                cout << "Incorrect credentials." << endl;
                 continue;
             }
             cout << "Successfully logged in!" << endl;
             break;
         }
         if(!users.search(user_type, id, password)){
-            cout << "Incorrect credentials. " << endl;
+            cout << "Incorrect credentials." << endl;
             continue;
         }
-        cout << "Successfully logged in!" << endl;
+        cout << "Successfully logged in!" << endl << endl;
         break;
     }
 }
 
-void welcome(Librarian& librarian, UserDatabase& users){
+int welcome(Librarian& librarian, UserDatabase& users){
     cout << "Welcome to Library Management System!" << endl;
     int user_type;
     while(true){
-        cout << "If you are the librarian, enter 1. " << endl;
-        cout << "If you are a professor, enter 2. " << endl;
-        cout << "If you are a student, enter 3. " << endl;
+        cout << "If you are the librarian, enter 1." << endl;
+        cout << "If you are a professor, enter 2." << endl;
+        cout << "If you are a student, enter 3." << endl;
         cin >> user_type;
         if(!(user_type == 1 || user_type == 2 || user_type == 3)){
-            cout << "Please only enter 1, 2 or 3" << endl;
+            cout << "Please enter 1, 2 or 3 only." << endl;
             continue;
         }
         login(user_type, librarian, users);
-        break;
+        return user_type;
     }
+}
+
+void librarian_user_tasks(){
+    int sub_task;
+    while(true){
+        cout << "Please enter:" << endl;
+        cout << "1 to list all users" << endl;
+        cout << "2 to add a new user" << endl;
+        cout << "3 to update a user" << endl;
+        cout << "4 to delete a user" << endl;
+        cout << "5 to list all books issued to a user" << endl;
+        cin >> sub_task;
+        switch(sub_task){
+        case 1:
+            break;
+        
+        case 2:
+            break;
+        
+        case 3:
+            break;
+        
+        case 4:
+            break;
+        
+        case 5:
+            break;
+        
+        default:
+            cout << "Please enter 1, 2, 3, 4 or 5 only." << endl;
+            continue;
+        }
+    }
+}
+
+void librarian_book_tasks(){
+
+}
+
+void librarian_flow(){
+    cout << "Hello librarian!" << endl;
+    int task;
+    while(true){
+        cout << "Please enter:" << endl;
+        cout << "1 for users" << endl;
+        cout << "2 for books" << endl;
+        cin >> task;
+        switch(task){
+        case 1:
+            librarian_user_tasks();
+            break;
+        
+        case 2:
+            librarian_book_tasks();
+            break;
+        
+        default:
+            cout << "Please enter 1 or 2 only." << endl;
+            continue;
+        }
+    }
+}
+
+void professor_flow(){
+    
+}
+
+void student_flow(){
+    
 }
 
 int main(){
     UserDatabase users;
     Librarian librarian;
     librarian.set_creds("Librarian", "librarian", "password");
-    welcome(librarian, users);
+    int user_type = welcome(librarian, users);
+    switch(user_type){
+    case 1:
+        librarian_flow();
+        break;
+    
+    case 2:
+        professor_flow();
+        break;
+    
+    case 3:
+        student_flow();
+        break;
+    
+    default:
+        break;
+    }
     return 0;
 }
