@@ -107,6 +107,8 @@ public:
     }
 };
 
+BookDatabase books;
+
 class User{
 protected:
     string name;
@@ -328,7 +330,6 @@ public:
 
 UserDatabase users;
 Librarian librarian;
-BookDatabase books;
 
 string login(int user_type){
     string id, password;
