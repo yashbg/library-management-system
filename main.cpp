@@ -331,7 +331,7 @@ public:
 UserDatabase users;
 Librarian librarian;
 
-pair<int, string> welcome(){
+pair<int, string> login(){
     cout << "Welcome to Library Management System!" << endl;
     int input;
     while(true){
@@ -861,7 +861,7 @@ void student_flow(int user_type, string id){
 int main(){
     librarian.set_creds("Librarian", "librarian", "password");
     while(true){
-        auto [input, id] = welcome();
+        auto [input, id] = login();
         if(input == -1){
             return 0;
         }
