@@ -21,7 +21,7 @@ class Book{
     string isbn;
     string publication;
     bool is_available = true;
-    int issued_to_type;
+    int issued_to_type = 0;
     string issued_to_id;
 
 public:
@@ -52,6 +52,12 @@ public:
 
     pair<int, string> check_book_issued_to(){
         return {issued_to_type, issued_to_id};
+    }
+
+    void return_book(){
+        is_available = true;
+        issued_to_type = 0;
+        issued_to_id = "";
     }
 };
 
@@ -103,6 +109,10 @@ public:
 
     Book get_book(string isbn){
         return books.find(isbn)->second;
+    }
+
+    void return_book(string isbn){
+        books.find(isbn)->second.return_book();
     }
 };
 
@@ -188,6 +198,7 @@ public:
             old_books_fine += delay * PROFESSOR_FINE_RATE;
         }
         books_issued.erase(isbn);
+        books.return_book(isbn);
     }
 
     bool check_issued_book(string isbn){
@@ -272,6 +283,7 @@ public:
             old_books_fine += delay * STUDENT_FINE_RATE;
         }
         books_issued.erase(isbn);
+        books.return_book(isbn);
     }
 
     bool check_issued_book(string isbn){
