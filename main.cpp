@@ -1,5 +1,8 @@
 #include <bits/stdc++.h>
 using namespace std;
+using namespace chrono;
+
+typedef chrono::_V2::steady_clock::time_point _time;
 
 const int PROFESSOR_ISSUE_DURATION = 60;
 const int PROFESSOR_FINE_RATE = 5;
@@ -87,7 +90,7 @@ public:
         }
         cout << "Here is a list of all the books:" << endl << endl;
         int i = 1;
-        for(auto book_item : books){
+        for(auto& book_item : books){
             cout << "Book " << i << ":" << endl;
             book_item.second.display();
             i++;
@@ -132,16 +135,28 @@ public:
 };
 
 class Professor: public User{
-    int fine_amount;
-    vector<Book> books_issued;
+    long long old_books_fine = 0;
+    long long fine_paid = 0;
+    vector<pair<Book, _time>> books_issued;
 
 public:
-    int calculate_fine(int delay){
-
+    long long calculate_fine(){
+        long long fine = 0;
+        _time now = steady_clock::now(); 
+        for(auto& book_item : books_issued){
+            _time issued_time = book_item.second;
+            long long duration = duration_cast<seconds>(now - issued_time).count();
+            if(duration > PROFESSOR_ISSUE_DURATION){
+                long long delay = duration - PROFESSOR_ISSUE_DURATION;
+                fine += delay * PROFESSOR_FINE_RATE;
+            }
+        }
+        return fine + old_books_fine - fine_paid;
     }
 
     void clear_fine_amount(){
-
+        long long fine = calculate_fine();
+        fine_paid += fine;
     }
 
     void display_issued_books(){
@@ -152,7 +167,8 @@ public:
         }
         cout << "Here is a list of the books:" << endl << endl;
         int i = 1;
-        for(auto book : books_issued){
+        for(auto& book_item : books_issued){
+            Book book = book_item.first;
             cout << "Book " << i << ":" << endl;
             book.display();
             cout << endl;
@@ -163,21 +179,34 @@ public:
     void issue_book(string isbn){
         Book book = books.get_book(isbn);
         book.book_request(PROFESSOR_USER_TYPE, id);
-        books_issued.push_back(book);
+        _time issue_time = steady_clock::now();
+        books_issued.push_back({book, issue_time});
     }
 };
 
 class Student: public User{
-    int fine_amount;
-    vector<Book> books_issued;
+    long long old_books_fine = 0;
+    long long fine_paid = 0;
+    vector<pair<Book, _time>> books_issued;
 
 public:
-    int calculate_fine(int delay){
-
+    long long calculate_fine(){
+        long long fine = 0;
+        _time now = steady_clock::now(); 
+        for(auto& book_item : books_issued){
+            _time issued_time = book_item.second;
+            long long duration = duration_cast<seconds>(now - issued_time).count();
+            if(duration > STUDENT_ISSUE_DURATION){
+                long long delay = duration - STUDENT_ISSUE_DURATION;
+                fine += delay * STUDENT_FINE_RATE;
+            }
+        }
+        return fine + old_books_fine - fine_paid;
     }
 
     void clear_fine_amount(){
-
+        long long fine = calculate_fine();
+        fine_paid += fine;
     }
 
     void display_issued_books(){
@@ -188,7 +217,8 @@ public:
         }
         cout << "Here is a list of the books:" << endl << endl;
         int i = 1;
-        for(auto book : books_issued){
+        for(auto& book_item : books_issued){
+            Book book = book_item.first;
             cout << "Book " << i << ":" << endl;
             book.display();
             cout << endl;
@@ -203,7 +233,8 @@ public:
     void issue_book(string isbn){
         Book book = books.get_book(isbn);
         book.book_request(STUDENT_USER_TYPE, id);
-        books_issued.push_back(book);
+        _time issue_time = steady_clock::now();
+        books_issued.push_back({book, issue_time});
     }
 };
 
@@ -297,7 +328,7 @@ public:
         if(professors.size()){
             cout << "Here is a list of the professors:" << endl << endl;
             int i = 1;
-            for(auto professor_item : professors){
+            for(auto& professor_item : professors){
                 cout << "Professor " << i << ":" << endl;
                 professor_item.second.display();
                 i++;
@@ -306,7 +337,7 @@ public:
         if(students.size()){
             cout << "Here is a list of the students:" << endl << endl;
             int i = 1;
-            for(auto student_item : students){
+            for(auto& student_item : students){
                 cout << "Student " << i << ":" << endl;
                 student_item.second.display();
                 i++;
@@ -325,6 +356,28 @@ public:
         }
         student.issue_book(isbn);
         return true;
+    }
+
+    void calculate_dues(int user_type, string id){
+        if(user_type == PROFESSOR_USER_TYPE){
+            long long fine = professors.find(id)->second.calculate_fine();
+            cout << "You have to pay " << fine << " rupees. Please clear your dues as soon as possible!" << endl << endl;
+        }
+        else{
+            long long fine = students.find(id)->second.calculate_fine();
+            cout << "You have to pay " << fine << " rupees. Please clear your dues as soon as possible!" << endl << endl;
+        }
+    }
+
+    void clear_dues(int user_type, string id){
+        if(user_type == PROFESSOR_USER_TYPE){
+            professors.find(id)->second.clear_fine_amount();
+            cout << "Thanks for clearing your dues!" << endl << endl;
+        }
+        else{
+            students.find(id)->second.clear_fine_amount();
+            cout << "Thanks for clearing your dues!" << endl << endl;
+        }
     }
 };
 
@@ -791,7 +844,9 @@ void professor_flow(int user_type, string id){
         cout << "2 to list all books you have" << endl;
         cout << "3 to check if a book is available for issue" << endl;
         cout << "4 to issue a book" << endl;
-        cout << "5 to logout" << endl;
+        cout << "5 to know your current dues" << endl;
+        cout << "6 to clear your dues" << endl;
+        cout << "7 to logout" << endl;
         cin >> task;
         switch(task){
         case 1:
@@ -809,8 +864,16 @@ void professor_flow(int user_type, string id){
         case 4:
             issue_book(user_type, id);
             break;
-
+        
         case 5:
+            users.calculate_dues(user_type, id);
+            break;
+        
+        case 6:
+            users.clear_dues(user_type, id);
+            break;
+
+        case 7:
             return;
         
         default:
@@ -829,7 +892,9 @@ void student_flow(int user_type, string id){
         cout << "2 to list all books you have" << endl;
         cout << "3 to check if a book is available for issue" << endl;
         cout << "4 to issue a book" << endl;
-        cout << "5 to logout" << endl;
+        cout << "5 to know your current dues" << endl;
+        cout << "6 to clear your dues" << endl;
+        cout << "7 to logout" << endl;
         cin >> task;
         switch(task){
         case 1:
@@ -847,8 +912,16 @@ void student_flow(int user_type, string id){
         case 4:
             issue_book(user_type, id);
             break;
-
+        
         case 5:
+            users.calculate_dues(user_type, id);
+            break;
+        
+        case 6:
+            users.clear_dues(user_type, id);
+            break;
+
+        case 7:
             return;
         
         default:
