@@ -1,9 +1,13 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-const int STUDENT_MAX_BOOKS = 5;
+const int PROFESSOR_ISSUE_DURATION = 60;
 const int PROFESSOR_FINE_RATE = 5;
+const int STUDENT_MAX_BOOKS = 5;
+const int STUDENT_ISSUE_DURATION = 30;
 const int STUDENT_FINE_RATE = 2;
+// const int PROFESSOR_USER_TYPE = 2;
+// const int STUDENT_USER_TYPE = 3;
 const string LIBRARIAN_NAME = "Librarian";
 const string LIBRARIAN_ID = "librarian";
 const string LIBRARIAN_PASSWORD = "password";
@@ -25,8 +29,10 @@ public:
         this->publication = publication;
     }
 
-    void book_request(string isbn){
-        
+    void book_request(int issued_to_type, string issued_to_id){
+        is_available = false;
+        this->issued_to_type = issued_to_type;
+        this->issued_to_id = issued_to_id;
     }
 
     string show_duedate(string isbn){
@@ -95,6 +101,10 @@ public:
     pair<int, string> check_book_issued_to(string isbn){
         return books.find(isbn)->second.check_book_issued_to();
     }
+
+    Book get_book(string isbn){
+        return books.find(isbn)->second;
+    }
 };
 
 class User{
@@ -147,6 +157,12 @@ public:
             i++;
         }
     }
+
+    void issue_book(string isbn){
+        Book book = books.get_book(isbn);
+        book.book_request(2, id);
+        books_issued.push_back(book);
+    }
 };
 
 class Student: public User{
@@ -176,6 +192,16 @@ public:
             cout << endl;
             i++;
         }
+    }
+
+    int get_num_books_issued(){
+        return books_issued.size();
+    }
+
+    void issue_book(string isbn){
+        Book book = books.get_book(isbn);
+        book.book_request(3, id);
+        books_issued.push_back(book);
     }
 };
 
@@ -284,6 +310,19 @@ public:
                 i++;
             }
         }
+    }
+
+    bool issue_book(int user_type, string id, string isbn){
+        if(user_type == 2){
+            professors.find(id)->second.issue_book(isbn);
+            return true;
+        }
+        Student student = students.find(id)->second;
+        if(student.get_num_books_issued() > STUDENT_MAX_BOOKS - 1){
+            return false;
+        }
+        student.issue_book(isbn);
+        return true;
     }
 };
 
@@ -716,6 +755,39 @@ void check_book_availability(){
     }
 }
 
+void issue_book(int user_type, string id){
+    int input;
+    while(true){
+        cout << "If you want to issue a book, enter 1." << endl;
+        cout << "If you want to go back, enter 2." << endl;
+        cin >> input;
+        if(input == 2){
+            return;
+        }
+        if(input != 1){
+            cout << "Please enter 1 or 2 only." << endl;
+            continue;
+        }
+        string isbn;
+        cout << "Enter the ISBN of the book you want to issue: ";
+        cin >> isbn;
+        if(!books.search(isbn)){
+            cout << "Book not found." << endl;
+            continue;
+        }
+        if(!books.check_availability(isbn)){
+            cout << "Book not available." << endl;
+            continue;
+        }
+        if(!users.issue_book(user_type, id, isbn)){
+            cout << "You have already issued " << STUDENT_MAX_BOOKS << " books. You cannot issue any more books." << endl << endl;
+            return;
+        }
+        cout << "Book issued! Please return the book in " << (user_type == 2 ? PROFESSOR_ISSUE_DURATION : STUDENT_ISSUE_DURATION) << " days." << endl << endl;
+        break;
+    }
+}
+
 void professor_flow(int user_type, string id){
     cout << "Hello Professor!" << endl;
     int task;
@@ -724,7 +796,8 @@ void professor_flow(int user_type, string id){
         cout << "1 to see all books" << endl;
         cout << "2 to list all books you have" << endl;
         cout << "3 to check if a book is available for issue" << endl;
-        cout << "4 to logout" << endl;
+        cout << "4 to issue a book" << endl;
+        cout << "5 to logout" << endl;
         cin >> task;
         switch(task){
         case 1:
@@ -740,6 +813,10 @@ void professor_flow(int user_type, string id){
             break;
         
         case 4:
+            issue_book(user_type, id);
+            break;
+
+        case 5:
             return;
         
         default:
@@ -757,7 +834,8 @@ void student_flow(int user_type, string id){
         cout << "1 to see all books" << endl;
         cout << "2 to list all books you have" << endl;
         cout << "3 to check if a book is available for issue" << endl;
-        cout << "4 to logout" << endl;
+        cout << "4 to issue a book" << endl;
+        cout << "5 to logout" << endl;
         cin >> task;
         switch(task){
         case 1:
@@ -773,6 +851,10 @@ void student_flow(int user_type, string id){
             break;
         
         case 4:
+            issue_book(user_type, id);
+            break;
+
+        case 5:
             return;
         
         default:
