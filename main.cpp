@@ -200,8 +200,8 @@ public:
         }
     }
 
-    void remove(string id){
-
+    void remove(int user_type, string id){
+        user_type == 2 ? professors.erase(id) : students.erase(id);
     }
 
     bool search(int user_type, string id){
@@ -383,6 +383,33 @@ void update_user(){
     }
 }
 
+void delete_user(){
+    string id;
+    int input;
+    while(true){
+        cout << "If you want to delete a professor, enter 1." << endl;
+        cout << "If you want to delete a student, enter 2." << endl;
+        cout << "If you want to go back, enter 3." << endl;
+        cin >> input;
+        if(input == 3){
+            return;
+        }
+        if(!(input == 1 || input == 2)){
+            cout << "Please enter 1, 2 or 3 only." << endl;
+            continue;
+        }
+        int user_type = input + 1;
+        cout << "Please enter the ID of the " << (user_type == 2 ? "professor" : "student") << ": ";
+        cin >> id;
+        if(!users.search(user_type, id)){
+            cout << (user_type == 2 ? "Professor" : "Student") << " not found." << endl;
+            continue;
+        }
+        users.remove(user_type, id);
+        break;
+    }
+}
+
 void librarian_user_tasks(){
     int sub_task;
     while(true){
@@ -408,6 +435,7 @@ void librarian_user_tasks(){
             break;
         
         case 4:
+        delete_user();
             break;
         
         case 5:
