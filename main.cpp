@@ -331,30 +331,6 @@ public:
 UserDatabase users;
 Librarian librarian;
 
-string login(int user_type){
-    string id, password;
-    while(true){
-        cout << "Please enter your ID: ";
-        cin >> id;
-        cout << "Please enter your password: ";
-        cin >> password;
-        if(user_type == 1){
-            if(!librarian.check_creds(id, password)){
-                cout << "Incorrect credentials." << endl;
-                continue;
-            }
-            cout << "Successfully logged in!" << endl << endl;
-            return id;
-        }
-        if(!users.check_creds(user_type, id, password)){
-            cout << "Incorrect credentials." << endl;
-            continue;
-        }
-        cout << "Successfully logged in!" << endl << endl;
-        return id;
-    }
-}
-
 pair<int, string> welcome(){
     cout << "Welcome to Library Management System!" << endl;
     int input;
@@ -372,7 +348,24 @@ pair<int, string> welcome(){
             cout << "Please enter 1, 2 or 3 only." << endl;
             continue;
         }
-        string id = login(user_type);
+        string id, password;
+        cout << "Please enter your ID: ";
+        cin >> id;
+        cout << "Please enter your password: ";
+        cin >> password;
+        if(user_type == 1){
+            if(!librarian.check_creds(id, password)){
+                cout << "Incorrect credentials." << endl << endl;
+                continue;
+            }
+            cout << "Successfully logged in!" << endl << endl;
+            return {user_type, id};
+        }
+        if(!users.check_creds(user_type, id, password)){
+            cout << "Incorrect credentials." << endl << endl;
+            continue;
+        }
+        cout << "Successfully logged in!" << endl << endl;
         return {user_type, id};
     }
 }
