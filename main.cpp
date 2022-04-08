@@ -189,8 +189,15 @@ public:
         }
     }
 
-    void update(string id, User& updated_user){
-
+    void update(int user_type, string id, string new_name, string new_password){
+        if(user_type == 2){
+            Professor professor = professors.find(id)->second;
+            professor.set_creds(new_name, id, new_password);
+        }
+        else{
+            Student student = students.find(id)->second;
+            student.set_creds(new_name, id, new_password);
+        }
     }
 
     void remove(string id){
@@ -343,6 +350,39 @@ void add_user(){
     }
 }
 
+void update_user(){
+    string id, new_name, new_password;
+    int input;
+    while(true){
+        cout << "If you want to update a professor, enter 1." << endl;
+        cout << "If you want to update a student, enter 2." << endl;
+        cout << "If you want to go back, enter 3." << endl;
+        cin >> input;
+        if(input == 3){
+            return;
+        }
+        if(!(input == 1 || input == 2)){
+            cout << "Please enter 1, 2 or 3 only." << endl;
+            continue;
+        }
+        int user_type = input + 1;
+        cout << "Please enter the ID of the " << (user_type == 2 ? "professor" : "student") << ": ";
+        cin >> id;
+        if(!users.search(user_type, id)){
+            cout << (user_type == 2 ? "Professor" : "Student") << " not found." << endl;
+            continue;
+        }
+        cout << "Now, please enter the new credentials of the " << (user_type == 2 ? "professor." : "student.") << endl;
+        cout << "Name: ";
+        cin >> new_name;
+        cout << "Password: ";
+        cin >> new_password;
+        users.update(user_type, id, new_name, new_password);
+        cout << (user_type == 2 ? "Professor" : "Student") << " updated!" << endl << endl;
+        break;
+    }
+}
+
 void librarian_user_tasks(){
     int sub_task;
     while(true){
@@ -364,6 +404,7 @@ void librarian_user_tasks(){
             break;
         
         case 3:
+            update_user();
             break;
         
         case 4:
@@ -435,13 +476,15 @@ void update_book(){
             cout << "Book not found." << endl;
             continue;
         }
-        cout << "Please enter the new title of the book: ";
+        cout << "Now, please enter the new details of the book." << endl;
+        cout << "Title: ";
         cin >> new_title;
-        cout << "Please enter the new name of the author: ";
+        cout << "Author: ";
         cin >> new_author;
-        cout << "Please enter the new publication of the book: ";
+        cout << "Publication: ";
         cin >> new_publication;
         books.update(isbn, new_title, new_author, new_publication);
+        cout << "Book updated!" << endl << endl;
         break;
     }
 }
