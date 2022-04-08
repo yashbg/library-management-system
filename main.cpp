@@ -137,14 +137,14 @@ public:
 class Professor: public User{
     long long old_books_fine = 0;
     long long fine_paid = 0;
-    vector<pair<Book, _time>> books_issued;
+    map<string, pair<Book, _time>> books_issued;
 
 public:
     long long calculate_fine(){
         long long fine = 0;
         _time now = steady_clock::now(); 
         for(auto& book_item : books_issued){
-            _time issued_time = book_item.second;
+            _time issued_time = book_item.second.second;
             long long duration = duration_cast<seconds>(now - issued_time).count();
             if(duration > PROFESSOR_ISSUE_DURATION){
                 long long delay = duration - PROFESSOR_ISSUE_DURATION;
@@ -168,7 +168,7 @@ public:
         cout << "Here is a list of the books:" << endl << endl;
         int i = 1;
         for(auto& book_item : books_issued){
-            Book book = book_item.first;
+            Book book = book_item.second.first;
             cout << "Book " << i << ":" << endl;
             book.display();
             cout << endl;
@@ -179,22 +179,37 @@ public:
     void issue_book(string isbn){
         Book book = books.get_book(isbn);
         book.book_request(PROFESSOR_USER_TYPE, id);
-        _time issue_time = steady_clock::now();
-        books_issued.push_back({book, issue_time});
+        _time issued_time = steady_clock::now();
+        books_issued[isbn] = {book, issued_time};
+    }
+
+    void return_book(string isbn){
+        _time issued_time = books_issued[isbn].second;
+        _time now = steady_clock::now(); 
+        long long duration = duration_cast<seconds>(now - issued_time).count();
+        if(duration > PROFESSOR_ISSUE_DURATION){
+            long long delay = duration - PROFESSOR_ISSUE_DURATION;
+            old_books_fine += delay * PROFESSOR_FINE_RATE;
+        }
+        books_issued.erase(isbn);
+    }
+
+    bool check_issued_book(string isbn){
+        return books_issued.find(isbn) != books_issued.end();
     }
 };
 
 class Student: public User{
     long long old_books_fine = 0;
     long long fine_paid = 0;
-    vector<pair<Book, _time>> books_issued;
+    map<string, pair<Book, _time>> books_issued;
 
 public:
     long long calculate_fine(){
         long long fine = 0;
         _time now = steady_clock::now(); 
         for(auto& book_item : books_issued){
-            _time issued_time = book_item.second;
+            _time issued_time = book_item.second.second;
             long long duration = duration_cast<seconds>(now - issued_time).count();
             if(duration > STUDENT_ISSUE_DURATION){
                 long long delay = duration - STUDENT_ISSUE_DURATION;
@@ -218,7 +233,7 @@ public:
         cout << "Here is a list of the books:" << endl << endl;
         int i = 1;
         for(auto& book_item : books_issued){
-            Book book = book_item.first;
+            Book book = book_item.second.first;
             cout << "Book " << i << ":" << endl;
             book.display();
             cout << endl;
@@ -233,8 +248,23 @@ public:
     void issue_book(string isbn){
         Book book = books.get_book(isbn);
         book.book_request(STUDENT_USER_TYPE, id);
-        _time issue_time = steady_clock::now();
-        books_issued.push_back({book, issue_time});
+        _time issued_time = steady_clock::now();
+        books_issued[isbn] = {book, issued_time};
+    }
+
+    void return_book(string isbn){
+        _time issued_time = books_issued[isbn].second;
+        _time now = steady_clock::now(); 
+        long long duration = duration_cast<seconds>(now - issued_time).count();
+        if(duration > STUDENT_ISSUE_DURATION){
+            long long delay = duration - STUDENT_ISSUE_DURATION;
+            old_books_fine += delay * STUDENT_FINE_RATE;
+        }
+        books_issued.erase(isbn);
+    }
+
+    bool check_issued_book(string isbn){
+        return books_issued.find(isbn) != books_issued.end();
     }
 };
 
@@ -377,6 +407,24 @@ public:
         else{
             students.find(id)->second.clear_fine_amount();
             cout << "Thanks for clearing your dues!" << endl << endl;
+        }
+    }
+
+    bool check_issued_book(int user_type, string id, string isbn){
+        if(user_type == PROFESSOR_USER_TYPE){
+            return professors.find(id)->second.check_issued_book(isbn);
+        }
+        else{
+            return students.find(id)->second.check_issued_book(isbn);
+        }
+    }
+
+    void return_book(int user_type, string id, string isbn){
+        if(user_type == PROFESSOR_USER_TYPE){
+            professors.find(id)->second.return_book(isbn);
+        }
+        else{
+            students.find(id)->second.return_book(isbn);
         }
     }
 };
@@ -835,6 +883,35 @@ void issue_book(int user_type, string id){
     }
 }
 
+void return_book(int user_type, string id){
+    int input;
+    while(true){
+        cout << "If you want to return a book, enter 1." << endl;
+        cout << "If you want to go back, enter 2." << endl;
+        cin >> input;
+        if(input == 2){
+            return;
+        }
+        if(input != 1){
+            cout << "Please enter 1 or 2 only." << endl;
+            continue;
+        }
+        string isbn;
+        cout << "Enter the ISBN of the book you want to return: ";
+        cin >> isbn;
+        if(!books.search(isbn)){
+            cout << "Book not found." << endl;
+            continue;
+        }
+        if(!users.check_issued_book(user_type, id, isbn)){
+            cout << "You have not issued this book." << endl;
+            continue;
+        }
+        users.return_book(user_type, id, isbn);
+        break;
+    }
+}
+
 void professor_flow(int user_type, string id){
     cout << "Hello Professor!" << endl;
     int task;
@@ -844,9 +921,10 @@ void professor_flow(int user_type, string id){
         cout << "2 to list all books you have" << endl;
         cout << "3 to check if a book is available for issue" << endl;
         cout << "4 to issue a book" << endl;
-        cout << "5 to know your current dues" << endl;
-        cout << "6 to clear your dues" << endl;
-        cout << "7 to logout" << endl;
+        cout << "5 to return a book" << endl;
+        cout << "6 to know your current dues" << endl;
+        cout << "7 to clear your dues" << endl;
+        cout << "8 to logout" << endl;
         cin >> task;
         switch(task){
         case 1:
@@ -866,14 +944,18 @@ void professor_flow(int user_type, string id){
             break;
         
         case 5:
-            users.calculate_dues(user_type, id);
+            return_book(user_type, id);
             break;
         
         case 6:
+            users.calculate_dues(user_type, id);
+            break;
+        
+        case 7:
             users.clear_dues(user_type, id);
             break;
 
-        case 7:
+        case 8:
             return;
         
         default:
@@ -892,9 +974,10 @@ void student_flow(int user_type, string id){
         cout << "2 to list all books you have" << endl;
         cout << "3 to check if a book is available for issue" << endl;
         cout << "4 to issue a book" << endl;
-        cout << "5 to know your current dues" << endl;
-        cout << "6 to clear your dues" << endl;
-        cout << "7 to logout" << endl;
+        cout << "5 to return a book" << endl;
+        cout << "6 to know your current dues" << endl;
+        cout << "7 to clear your dues" << endl;
+        cout << "8 to logout" << endl;
         cin >> task;
         switch(task){
         case 1:
@@ -914,14 +997,18 @@ void student_flow(int user_type, string id){
             break;
         
         case 5:
-            users.calculate_dues(user_type, id);
+            return_book(user_type, id);
             break;
         
         case 6:
+            users.calculate_dues(user_type, id);
+            break;
+        
+        case 7:
             users.clear_dues(user_type, id);
             break;
 
-        case 7:
+        case 8:
             return;
         
         default:
