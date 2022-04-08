@@ -38,10 +38,6 @@ public:
         this->issued_to_id = issued_to_id;
     }
 
-    string show_duedate(string isbn){
-
-    }
-
     void display(){
         cout << "Title: " << title << endl;
         cout << "Author: " << author << endl;
@@ -142,7 +138,7 @@ class Professor: public User{
 public:
     long long calculate_fine(){
         long long fine = 0;
-        _time now = steady_clock::now(); 
+        _time now = steady_clock::now();
         for(auto& book_item : books_issued){
             _time issued_time = book_item.second.second;
             long long duration = duration_cast<seconds>(now - issued_time).count();
@@ -185,7 +181,7 @@ public:
 
     void return_book(string isbn){
         _time issued_time = books_issued[isbn].second;
-        _time now = steady_clock::now(); 
+        _time now = steady_clock::now();
         long long duration = duration_cast<seconds>(now - issued_time).count();
         if(duration > PROFESSOR_ISSUE_DURATION){
             long long delay = duration - PROFESSOR_ISSUE_DURATION;
@@ -197,6 +193,21 @@ public:
     bool check_issued_book(string isbn){
         return books_issued.find(isbn) != books_issued.end();
     }
+
+    void show_duedate(string isbn){
+        _time issued_time = books_issued.find(isbn)->second.second;
+        _time now = steady_clock::now();
+        long long time_rem = duration_cast<seconds>(issued_time - now).count() + PROFESSOR_ISSUE_DURATION;
+        if(time_rem < 0){
+            cout << "The due date for this book was " << -time_rem << " days ago. Please return this book as soon as possible." << endl << endl;
+        }
+        else if(time_rem == 0){
+            cout << "The due date for this book is today. Please return this book as soon as possible." << endl << endl;
+        }
+        else{
+            cout << "The due date for this book is after " << time_rem << " days. Please return this book before the due date." << endl << endl;
+        }
+    }
 };
 
 class Student: public User{
@@ -207,7 +218,7 @@ class Student: public User{
 public:
     long long calculate_fine(){
         long long fine = 0;
-        _time now = steady_clock::now(); 
+        _time now = steady_clock::now();
         for(auto& book_item : books_issued){
             _time issued_time = book_item.second.second;
             long long duration = duration_cast<seconds>(now - issued_time).count();
@@ -254,7 +265,7 @@ public:
 
     void return_book(string isbn){
         _time issued_time = books_issued[isbn].second;
-        _time now = steady_clock::now(); 
+        _time now = steady_clock::now();
         long long duration = duration_cast<seconds>(now - issued_time).count();
         if(duration > STUDENT_ISSUE_DURATION){
             long long delay = duration - STUDENT_ISSUE_DURATION;
@@ -265,6 +276,21 @@ public:
 
     bool check_issued_book(string isbn){
         return books_issued.find(isbn) != books_issued.end();
+    }
+
+    void show_duedate(string isbn){
+        _time issued_time = books_issued.find(isbn)->second.second;
+        _time now = steady_clock::now();
+        long long time_rem = duration_cast<seconds>(issued_time - now).count() + STUDENT_ISSUE_DURATION;
+        if(time_rem < 0){
+            cout << "The due date for this book was " << -time_rem << " days ago. Please return this book as soon as possible." << endl << endl;
+        }
+        else if(time_rem == 0){
+            cout << "The due date for this book is today. Please return this book as soon as possible." << endl << endl;
+        }
+        else{
+            cout << "The due date for this book is after " << time_rem << " days. Please return this book before the due date." << endl << endl;
+        }
     }
 };
 
@@ -425,6 +451,15 @@ public:
         }
         else{
             students.find(id)->second.return_book(isbn);
+        }
+    }
+
+    void show_duedate(int user_type, string id, string isbn){
+        if(user_type == PROFESSOR_USER_TYPE){
+            professors.find(id)->second.show_duedate(isbn);
+        }
+        else{
+            students.find(id)->second.show_duedate(isbn);
         }
     }
 };
@@ -912,6 +947,35 @@ void return_book(int user_type, string id){
     }
 }
 
+void show_duedate(int user_type, string id){
+    int input;
+    while(true){
+        cout << "If you want to know the due date for a book, enter 1." << endl;
+        cout << "If you want to go back, enter 2." << endl;
+        cin >> input;
+        if(input == 2){
+            return;
+        }
+        if(input != 1){
+            cout << "Please enter 1 or 2 only." << endl;
+            continue;
+        }
+        string isbn;
+        cout << "Enter the ISBN of the book you want to know the due date of: ";
+        cin >> isbn;
+        if(!books.search(isbn)){
+            cout << "Book not found." << endl;
+            continue;
+        }
+        if(!users.check_issued_book(user_type, id, isbn)){
+            cout << "You have not issued this book." << endl;
+            continue;
+        }
+        users.show_duedate(user_type, id, isbn);
+        break;
+    }
+}
+
 void professor_flow(int user_type, string id){
     cout << "Hello Professor!" << endl;
     int task;
@@ -922,9 +986,10 @@ void professor_flow(int user_type, string id){
         cout << "3 to check if a book is available for issue" << endl;
         cout << "4 to issue a book" << endl;
         cout << "5 to return a book" << endl;
-        cout << "6 to know your current dues" << endl;
-        cout << "7 to clear your dues" << endl;
-        cout << "8 to logout" << endl;
+        cout << "6 to know the due date for a book" << endl;
+        cout << "7 to know your current dues" << endl;
+        cout << "8 to clear your dues" << endl;
+        cout << "9 to logout" << endl;
         cin >> task;
         switch(task){
         case 1:
@@ -948,14 +1013,18 @@ void professor_flow(int user_type, string id){
             break;
         
         case 6:
-            users.calculate_dues(user_type, id);
+            show_duedate(user_type, id);
             break;
         
         case 7:
+            users.calculate_dues(user_type, id);
+            break;
+        
+        case 8:
             users.clear_dues(user_type, id);
             break;
 
-        case 8:
+        case 9:
             return;
         
         default:
@@ -975,9 +1044,10 @@ void student_flow(int user_type, string id){
         cout << "3 to check if a book is available for issue" << endl;
         cout << "4 to issue a book" << endl;
         cout << "5 to return a book" << endl;
-        cout << "6 to know your current dues" << endl;
-        cout << "7 to clear your dues" << endl;
-        cout << "8 to logout" << endl;
+        cout << "6 to know the due date for a book" << endl;
+        cout << "7 to know your current dues" << endl;
+        cout << "8 to clear your dues" << endl;
+        cout << "9 to logout" << endl;
         cin >> task;
         switch(task){
         case 1:
@@ -1001,14 +1071,18 @@ void student_flow(int user_type, string id){
             break;
         
         case 6:
-            users.calculate_dues(user_type, id);
+            show_duedate(user_type, id);
             break;
         
         case 7:
+            users.calculate_dues(user_type, id);
+            break;
+        
+        case 8:
             users.clear_dues(user_type, id);
             break;
 
-        case 8:
+        case 9:
             return;
         
         default:
