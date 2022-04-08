@@ -6,6 +6,8 @@ const int PROFESSOR_FINE_RATE = 5;
 const int STUDENT_MAX_BOOKS = 5;
 const int STUDENT_ISSUE_DURATION = 30;
 const int STUDENT_FINE_RATE = 2;
+const int PROFESSOR_USER_TYPE = 2;
+const int STUDENT_USER_TYPE = 3;
 const string LIBRARIAN_NAME = "Librarian";
 const string LIBRARIAN_ID = "librarian";
 const string LIBRARIAN_PASSWORD = "password";
@@ -158,7 +160,7 @@ public:
 
     void issue_book(string isbn){
         Book book = books.get_book(isbn);
-        book.book_request(2, id);
+        book.book_request(PROFESSOR_USER_TYPE, id);
         books_issued.push_back(book);
     }
 };
@@ -198,7 +200,7 @@ public:
 
     void issue_book(string isbn){
         Book book = books.get_book(isbn);
-        book.book_request(3, id);
+        book.book_request(STUDENT_USER_TYPE, id);
         books_issued.push_back(book);
     }
 };
@@ -213,7 +215,7 @@ class UserDatabase{
 
 public:
     void add(int user_type, string name, string id, string password){
-        if(user_type == 2){
+        if(user_type == PROFESSOR_USER_TYPE){
             Professor professor;
             professor.set_creds(name, id, password);
             professors[id] = professor;
@@ -226,7 +228,7 @@ public:
     }
 
     void update(int user_type, string id, string new_name, string new_password){
-        if(user_type == 2){
+        if(user_type == PROFESSOR_USER_TYPE){
             Professor professor = professors.find(id)->second;
             professor.set_creds(new_name, id, new_password);
         }
@@ -237,18 +239,18 @@ public:
     }
 
     void remove(int user_type, string id){
-        user_type == 2 ? professors.erase(id) : students.erase(id);
+        user_type == PROFESSOR_USER_TYPE ? professors.erase(id) : students.erase(id);
     }
 
     bool search(int user_type, string id){
-        if(user_type == 2){
+        if(user_type == PROFESSOR_USER_TYPE){
             return professors.find(id) != professors.end();
         }
         return students.find(id) != students.end();
     }
 
     bool check_creds(int user_type, string id, string password){
-        if(user_type == 2){
+        if(user_type == PROFESSOR_USER_TYPE){
             auto professor_itr = professors.find(id);
             if(professor_itr == professors.end()){
                 return false;
@@ -265,7 +267,7 @@ public:
     }
 
     void display_issued_books(int user_type, string id){
-        if(user_type == 2){
+        if(user_type == PROFESSOR_USER_TYPE){
             Professor professor = professors.find(id)->second;
             professor.display_issued_books();
         }
@@ -276,7 +278,7 @@ public:
     }
 
     void display_by_id(int user_type, string id){
-        if(user_type == 2){
+        if(user_type == PROFESSOR_USER_TYPE){
             professors.find(id)->second.display();
         }
         else{
@@ -311,7 +313,7 @@ public:
     }
 
     bool issue_book(int user_type, string id, string isbn){
-        if(user_type == 2){
+        if(user_type == PROFESSOR_USER_TYPE){
             professors.find(id)->second.issue_book(isbn);
             return true;
         }
@@ -390,19 +392,19 @@ void add_user(){
             continue;
         }
         int user_type = input + 1;
-        cout << "Please enter the ID of the " << (user_type == 2 ? "professor" : "student") << ": ";
+        cout << "Please enter the ID of the " << (user_type == PROFESSOR_USER_TYPE ? "professor" : "student") << ": ";
         cin >> id;
         if(users.search(user_type, id)){
-            cout << "A " << (user_type == 2 ? "professor" : "student") << " with this ID already exists." << endl;
+            cout << "A " << (user_type == PROFESSOR_USER_TYPE ? "professor" : "student") << " with this ID already exists." << endl;
             continue;
         }
-        cout << "Now, please enter the credentials of the " << (user_type == 2 ? "professor." : "student.") << endl;
+        cout << "Now, please enter the credentials of the " << (user_type == PROFESSOR_USER_TYPE ? "professor." : "student.") << endl;
         cout << "Name: ";
         cin >> name;
         cout << "Password: ";
         cin >> password;
         users.add(user_type, name, id, password);
-        cout << (user_type == 2 ? "Professor" : "Student") << " added!" << endl << endl;
+        cout << (user_type == PROFESSOR_USER_TYPE ? "Professor" : "Student") << " added!" << endl << endl;
         break;
     }
 }
@@ -423,19 +425,19 @@ void update_user(){
             continue;
         }
         int user_type = input + 1;
-        cout << "Please enter the ID of the " << (user_type == 2 ? "professor" : "student") << ": ";
+        cout << "Please enter the ID of the " << (user_type == PROFESSOR_USER_TYPE ? "professor" : "student") << ": ";
         cin >> id;
         if(!users.search(user_type, id)){
-            cout << (user_type == 2 ? "Professor" : "Student") << " not found." << endl;
+            cout << (user_type == PROFESSOR_USER_TYPE ? "Professor" : "Student") << " not found." << endl;
             continue;
         }
-        cout << "Now, please enter the new credentials of the " << (user_type == 2 ? "professor." : "student.") << endl;
+        cout << "Now, please enter the new credentials of the " << (user_type == PROFESSOR_USER_TYPE ? "professor." : "student.") << endl;
         cout << "Name: ";
         cin >> new_name;
         cout << "Password: ";
         cin >> new_password;
         users.update(user_type, id, new_name, new_password);
-        cout << (user_type == 2 ? "Professor" : "Student") << " updated!" << endl << endl;
+        cout << (user_type == PROFESSOR_USER_TYPE ? "Professor" : "Student") << " updated!" << endl << endl;
         break;
     }
 }
@@ -456,10 +458,10 @@ void delete_user(){
             continue;
         }
         int user_type = input + 1;
-        cout << "Please enter the ID of the " << (user_type == 2 ? "professor" : "student") << ": ";
+        cout << "Please enter the ID of the " << (user_type == PROFESSOR_USER_TYPE ? "professor" : "student") << ": ";
         cin >> id;
         if(!users.search(user_type, id)){
-            cout << (user_type == 2 ? "Professor" : "Student") << " not found." << endl;
+            cout << (user_type == PROFESSOR_USER_TYPE ? "Professor" : "Student") << " not found." << endl;
             continue;
         }
         users.remove(user_type, id);
@@ -483,10 +485,10 @@ void display_issued_books(){
             continue;
         }
         int user_type = input + 1;
-        cout << "Please enter the ID of the " << (user_type == 2 ? "professor" : "student") << ": ";
+        cout << "Please enter the ID of the " << (user_type == PROFESSOR_USER_TYPE ? "professor" : "student") << ": ";
         cin >> id;
         if(!users.search(user_type, id)){
-            cout << (user_type == 2 ? "Professor" : "Student") << " not found." << endl;
+            cout << (user_type == PROFESSOR_USER_TYPE ? "Professor" : "Student") << " not found." << endl;
             continue;
         }
         users.display_issued_books(user_type, id);
@@ -781,7 +783,7 @@ void issue_book(int user_type, string id){
             cout << "You have already issued " << STUDENT_MAX_BOOKS << " books. You cannot issue any more books." << endl << endl;
             return;
         }
-        cout << "Book issued! Please return the book in " << (user_type == 2 ? PROFESSOR_ISSUE_DURATION : STUDENT_ISSUE_DURATION) << " days." << endl << endl;
+        cout << "Book issued! Please return the book in " << (user_type == PROFESSOR_USER_TYPE ? PROFESSOR_ISSUE_DURATION : STUDENT_ISSUE_DURATION) << " days." << endl << endl;
         break;
     }
 }
@@ -875,11 +877,11 @@ int main(){
             librarian_flow();
             break;
         
-        case 2:
+        case PROFESSOR_USER_TYPE:
             professor_flow(user_type, id);
             break;
         
-        case 3:
+        case STUDENT_USER_TYPE:
             student_flow(user_type, id);
             break;
         
