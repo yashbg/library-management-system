@@ -1,6 +1,6 @@
 # library-management-system
 
-This is a CLI for a Library Management System. 
+This is a CLI for a Library Management System. Its functionality can be found in `functionality.pdf`. 
 
 ## Instructions
 
