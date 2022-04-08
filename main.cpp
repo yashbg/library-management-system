@@ -75,6 +75,10 @@ public:
 
     void display(){
         cout << "There are " << books.size() << " books in total." << endl;
+        if(!books.size()){
+            cout << endl;
+            return;
+        }
         cout << "Here is a list of all the books:" << endl << endl;
         int i = 1;
         for(auto book_item : books){
@@ -130,7 +134,11 @@ public:
 
     void display_issued_books(){
         cout << "You have issued " << books_issued.size() << " books." << endl;
-        cout << "Here is a list of the books:" << endl;
+        if(!books_issued.size()){
+            cout << endl;
+            return;
+        }
+        cout << "Here is a list of the books:" << endl << endl;
         int i = 1;
         for(auto book : books_issued){
             cout << "Book " << i << ":" << endl;
@@ -156,7 +164,11 @@ public:
 
     void display_issued_books(){
         cout << "You have issued " << books_issued.size() << " books." << endl;
-        cout << "Here is a list of the books:" << endl;
+        if(!books_issued.size()){
+            cout << endl;
+            return;
+        }
+        cout << "Here is a list of the books:" << endl << endl;
         int i = 1;
         for(auto book : books_issued){
             cout << "Book " << i << ":" << endl;
@@ -250,19 +262,27 @@ public:
 
     void display(){
         cout << "There are " << professors.size() << " professors and " << students.size() << " students." << endl;
-        cout << "Here is a list of the professors:" << endl << endl;
-        int i = 1;
-        for(auto professor_item : professors){
-            cout << "Professor " << i << ":" << endl;
-            professor_item.second.display();
-            i++;
+        if(!(professors.size() + students.size())){
+            cout << endl;
+            return;
         }
-        cout << "Here is a list of the students:" << endl << endl;
-        i = 1;
-        for(auto student_item : students){
-            cout << "Student " << i << ":" << endl;
-            student_item.second.display();
-            i++;
+        if(professors.size()){
+            cout << "Here is a list of the professors:" << endl << endl;
+            int i = 1;
+            for(auto professor_item : professors){
+                cout << "Professor " << i << ":" << endl;
+                professor_item.second.display();
+                i++;
+            }
+        }
+        if(students.size()){
+            cout << "Here is a list of the students:" << endl << endl;
+            int i = 1;
+            for(auto student_item : students){
+                cout << "Student " << i << ":" << endl;
+                student_item.second.display();
+                i++;
+            }
         }
     }
 };
@@ -410,6 +430,33 @@ void delete_user(){
     }
 }
 
+void display_issued_books(){
+    string id;
+    int input;
+    while(true){
+        cout << "If you want to list all books issued to a professor, enter 1." << endl;
+        cout << "If you want to list all books issued to a student, enter 2." << endl;
+        cout << "If you want to go back, enter 3." << endl;
+        cin >> input;
+        if(input == 3){
+            return;
+        }
+        if(!(input == 1 || input == 2)){
+            cout << "Please enter 1, 2 or 3 only." << endl;
+            continue;
+        }
+        int user_type = input + 1;
+        cout << "Please enter the ID of the " << (user_type == 2 ? "professor" : "student") << ": ";
+        cin >> id;
+        if(!users.search(user_type, id)){
+            cout << (user_type == 2 ? "Professor" : "Student") << " not found." << endl;
+            continue;
+        }
+        users.display_issued_books(user_type, id);
+        break;
+    }
+}
+
 void librarian_user_tasks(){
     int sub_task;
     while(true){
@@ -435,10 +482,11 @@ void librarian_user_tasks(){
             break;
         
         case 4:
-        delete_user();
+            delete_user();
             break;
         
         case 5:
+            display_issued_books();
             break;
         
         case 6:
